@@ -68,6 +68,6 @@ jobs:
           tag_name: nightly-release
           name: 'Nightly Release'
           body: |
-            Automated nightly release for commit ${{ github.sha }}. This release contains all of the newest features. Not intended for use unless you're a developer
+            Automated nightly release for commit ${{ github.sha }}. This release contains all of the newest features.
           files: |
             mcpatcher.zip
