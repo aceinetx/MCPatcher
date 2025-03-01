@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Rust
+      - name: Set up Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -31,10 +31,7 @@ jobs:
         if: startsWith(github.event.release.tag_name, 'nightly')
         shell: pwsh
         run: |
-          # Adjust the path to where your debug binary is located.
-          # For a binary crate, the debug binary is usually in:
-          # target\x86_64-pc-windows-msvc\debug\your_binary.exe
-          # Replace 'your_binary.exe' with the actual name of your binary.
+          # Replace 'your_binary.exe' with the name of your actual binary.
           $ErrorActionPreference = 'Stop'
           $binaryPath = "target\x86_64-pc-windows-msvc\debug\your_binary.exe"
           $zipPath = "x64_debug_binary.zip"
@@ -44,13 +41,12 @@ jobs:
           }
           Compress-Archive -Path $binaryPath -DestinationPath $zipPath
           Write-Host "Artifact $zipPath created."
-      
-      - name: Upload Debug Artifact
+
+      - name: Upload Debug Artifact using andelf/nightly-release
         if: startsWith(github.event.release.tag_name, 'nightly')
-        uses: softprops/action-gh-release@v1
+        uses: andelf/nightly-release@v1
         with:
-          tag_name: ${{ github.event.release.tag_name }}
-          name: x64_debug_binary.zip
-          artifacts: x64_debug_binary.zip
+          file: x64_debug_binary.zip
+          asset_name: x64_debug_binary.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
