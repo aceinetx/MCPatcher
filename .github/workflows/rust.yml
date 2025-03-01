@@ -1,0 +1,51 @@
+name: Build for Windows and Upload Debug Artifact
+
+on:
+  release:
+    types: [published]  # Trigger when a release is published
+
+jobs:
+  build-windows:
+    name: Build Windows x86_64 Debug Binary
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Add Windows target
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: Build in Debug mode
+        run: cargo build --target x86_64-pc-windows-msvc
+       
+      - name: Upload Debug Artifact
+        if: startsWith(github.event.release.tag_name, "nightly")
+        uses: softprops/action-gh-release@v1
+        with:
+          name: x64_debug_binary.zip
+          tag_name: ${{ github.event.release.tag_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Adjust the path to where your debug binary is located.
+          # For a binary crate, the debug binary is usually in:
+          # target/x86_64-pc-windows-msvc/debug/your_binary.exe
+          # We will zip the binary before uploading.
+          # Change 'your_binary.exe' to the actual name of your binary.
+          $ErrorActionPreference = "Stop"
+          # Define paths
+          $binaryPath = "target\x86_64-pc-windows-msvc\debug\your_binary.exe"
+          $zipPath = "x64_debug_binary.zip"
+          if (-Not (Test-Path $binaryPath)) {
+              Write-Error "Binary not found at $binaryPath"
+              exit 1
+          }
+          Compress-Archive -Path $binaryPath -DestinationPath $zipPath
+          Write-Host "Artifact $zipPath ready to upload."
