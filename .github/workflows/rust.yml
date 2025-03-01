@@ -1,8 +1,10 @@
 name: Build for Windows and Upload Debug Artifact
 
 on:
-  release:
-    types: [published]  # Trigger when a release is published
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build-windows:
