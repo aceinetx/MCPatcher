@@ -24,23 +24,16 @@ jobs:
 
       - name: Build in Debug mode
         run: cargo build --target x86_64-pc-windows-msvc
-       
-      - name: Upload Debug Artifact
-        if: startsWith(github.event.release.tag_name, "nightly")
-        uses: softprops/action-gh-release@v1
-        with:
-          name: x64_debug_binary.zip
-          tag_name: ${{ github.event.release.tag_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Zip Debug Binary
+        if: startsWith(github.event.release.tag_name, 'nightly')
+        shell: pwsh
         run: |
           # Adjust the path to where your debug binary is located.
           # For a binary crate, the debug binary is usually in:
-          # target/x86_64-pc-windows-msvc/debug/your_binary.exe
-          # We will zip the binary before uploading.
-          # Change 'your_binary.exe' to the actual name of your binary.
-          $ErrorActionPreference = "Stop"
-          # Define paths
+          # target\x86_64-pc-windows-msvc\debug\your_binary.exe
+          # Replace 'your_binary.exe' with the actual name of your binary.
+          $ErrorActionPreference = 'Stop'
           $binaryPath = "target\x86_64-pc-windows-msvc\debug\your_binary.exe"
           $zipPath = "x64_debug_binary.zip"
           if (-Not (Test-Path $binaryPath)) {
@@ -48,4 +41,14 @@ jobs:
               exit 1
           }
           Compress-Archive -Path $binaryPath -DestinationPath $zipPath
-          Write-Host "Artifact $zipPath ready to upload."
+          Write-Host "Artifact $zipPath created."
+      
+      - name: Upload Debug Artifact
+        if: startsWith(github.event.release.tag_name, 'nightly')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          name: x64_debug_binary.zip
+          artifacts: x64_debug_binary.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
