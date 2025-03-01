@@ -39,11 +39,35 @@ jobs:
           }
           Compress-Archive -Path $binaryPath -DestinationPath $zipPath
           Write-Host "Artifact $zipPath created."
-
-      - name: Upload release
-        uses: andelf/nightly-release@v1
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          file: x64_debug_binary.zip
-          asset_name: x64_debug_binary.zip
+          name: artifact
+          path: mcpatcher.zip
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: [ build-windows ]
+
+    steps:
+      - name: Authenticate GitHub CLI
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+
+      - name: Update Nightly Release
+        uses: andelf/nightly-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly-release
+          name: 'Nightly Release'
+          body: |
+            Automated nightly release for commit ${{ github.sha }}. This release contains all of the newest features. Not intended for use unless you're a developer
+          files: |
+            mcpatcher.zip
