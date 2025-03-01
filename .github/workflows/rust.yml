@@ -30,10 +30,9 @@ jobs:
       - name: Zip Debug Binary
         shell: pwsh
         run: |
-          # Replace 'your_binary.exe' with the name of your actual binary.
           $ErrorActionPreference = 'Stop'
-          $binaryPath = "target\x86_64-pc-windows-msvc\debug\your_binary.exe"
-          $zipPath = "x64_debug_binary.zip"
+          $binaryPath = "target\x86_64-pc-windows-msvc\debug\mcpatcher.exe"
+          $zipPath = "mcpatcher.zip"
           if (-Not (Test-Path $binaryPath)) {
               Write-Error "Binary not found at $binaryPath"
               exit 1
