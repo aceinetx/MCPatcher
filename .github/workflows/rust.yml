@@ -1,4 +1,4 @@
-name: Build for Windows and Upload Debug Artifact
+name: Build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows x86_64 Debug Binary
+    name: Build x86_64 Debug Binary
     runs-on: windows-latest
 
     steps:
@@ -28,7 +28,6 @@ jobs:
         run: cargo build --target x86_64-pc-windows-msvc
 
       - name: Zip Debug Binary
-        if: startsWith(github.event.release.tag_name, 'nightly')
         shell: pwsh
         run: |
           # Replace 'your_binary.exe' with the name of your actual binary.
@@ -42,8 +41,7 @@ jobs:
           Compress-Archive -Path $binaryPath -DestinationPath $zipPath
           Write-Host "Artifact $zipPath created."
 
-      - name: Upload Debug Artifact using andelf/nightly-release
-        if: startsWith(github.event.release.tag_name, 'nightly')
+      - name: Upload release
         uses: andelf/nightly-release@v1
         with:
           file: x64_debug_binary.zip
