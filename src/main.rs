@@ -28,13 +28,8 @@ fn main() {
         match g.getch() {
             Ok(Key::Char('q')) => break,
             Ok(Key::Char('p')) => {
-                if dll::takeown_dlls() {
-                    if !dll::download_dlls() {
-                        println!("[-] Download failed, cannot proceed");
-                    }
-                } else {
-                    println!("[-] Takeown failed, cannot proceed");
-                }
+		dll::takeown_dlls();
+		dll::download_dlls();
 
                 println!("[+] Patched successfully!");
             }
