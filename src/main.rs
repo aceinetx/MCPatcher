@@ -28,8 +28,9 @@ fn main() {
         match g.getch() {
             Ok(Key::Char('q')) => break,
             Ok(Key::Char('p')) => {
-		dll::takeown_dlls();
-		dll::download_dlls();
+				dll::takeown_dlls();
+				dll::rename_dlls();
+				dll::download_dlls();
 
                 println!("[+] Patched successfully!");
             }
